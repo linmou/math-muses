@@ -8,37 +8,8 @@ import { GAME_DATA } from './GameData';
 import SceneBackground from './SceneBackgrounds';
 import PuzzleVisualization from './PuzzleVisualization';
 import { useAudio } from '../../components/audio/AudioManager';
-
-// ============================================
-// AI导师回复函数（小星星）
-// ============================================
-function getMentorResponse(message, puzzle) {
-  const lower = message.toLowerCase();
-  
-  if (lower.includes('help') || lower.includes('don\'t understand') || lower.includes('confused')) {
-    return 'No worries! Let\'s look at this together ✨ Can you tell me what information the problem gives us? Let\'s list them out one by one!';
-  }
-  if (lower.includes('hint')) {
-    return 'Okay! Here\'s a little hint 💡 Try thinking about the quantities in the problem as "parts" - does that make it easier to understand?';
-  }
-  if (lower.includes('hard') || lower.includes('difficult')) {
-    return 'I understand how you feel 🤗 This puzzle is challenging! But finding it hard means you\'re pushing yourself, which is amazing! Shall we take it step by step, starting with the easiest part?';
-  }
-  if (lower.includes('tired') || lower.includes('break') || lower.includes('rest')) {
-    return 'You\'ve been working hard! Learning needs breaks too 🌸 How about getting some water and stretching? We can continue in 5 minutes!';
-  }
-  if (lower.includes('answer') || lower.includes('tell me')) {
-    return 'Hehe, Little Star can\'t give you the answer directly 😊 But I can help you think it through! What numbers does the problem mention? How are they related?';
-  }
-  if (lower.includes('how')) {
-    return 'Great question! Solving a puzzle is like assembling a jigsaw 🧩 Step 1: Find all the information we know. Step 2: Think about how they connect. What do you think is the key information here?';
-  }
-  if (lower.includes('correct') || lower.includes('right') || lower.includes('got it')) {
-    return 'Amazing! 🎉 You did so well! Every success is proof of your hard work. Ready for the next challenge?';
-  }
-  
-  return 'I\'m listening ✨ Can you tell me how you\'re thinking about this? Or what part is confusing you? Let\'s solve it together!';
-}
+import { generateChat } from '../../lib/ai-client';
+import { buildMentorContext } from '../../lib/mentor-context';
 
 // ============================================
 // 错误诊断函数
@@ -94,20 +65,24 @@ function MentorChat({ isOpen, onClose, currentPuzzle }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = (text) => {
+  const handleSend = async (text) => {
     const userMessage = text || input.trim();
     if (!userMessage) return;
 
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    const nextMessage = { role: 'user', content: userMessage };
+    const context = buildMentorContext(currentPuzzle);
+    const history = [...messages, nextMessage];
+
+    setMessages(history);
     setInput('');
     setIsTyping(true);
 
-    // 模拟AI思考延迟
-    setTimeout(() => {
-      const response = getMentorResponse(userMessage, currentPuzzle);
+    try {
+      const response = await generateChat({ messages: history, context });
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+    } finally {
       setIsTyping(false);
-    }, 800);
+    }
   };
 
   const quickReplies = ['I don\'t understand this', 'Can I get a hint?', 'This feels hard'];
