@@ -8,8 +8,8 @@ import { GAME_DATA } from './GameData';
 import SceneBackground from './SceneBackgrounds';
 import PuzzleVisualization from './PuzzleVisualization';
 import { useAudio } from '../../components/audio/AudioManager';
-import { generateChat } from '../../lib/ai-client';
 import { buildMentorContext } from '../../lib/mentor-context';
+import { fetchMentorReply } from '../../lib/mentor-reply';
 
 // ============================================
 // 错误诊断函数
@@ -78,8 +78,8 @@ function MentorChat({ isOpen, onClose, currentPuzzle }) {
     setIsTyping(true);
 
     try {
-      const response = await generateChat({ messages: history, context });
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      const response = await fetchMentorReply({ messages: history, context });
+      setMessages(prev => [...prev, { role: 'assistant', content: response.text }]);
     } finally {
       setIsTyping(false);
     }
