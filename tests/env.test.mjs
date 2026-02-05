@@ -8,3 +8,7 @@ test("optional env loading does not fail", () => {
   const result = verifyFrontendEnv();
   assert.equal(result.ok, true);
 });
+
+test('GEMINI_API_KEY is configured for backend', () => {
+  assert.ok(process.env.GEMINI_API_KEY, 'GEMINI_API_KEY missing');
+});

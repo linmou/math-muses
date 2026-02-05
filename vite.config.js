@@ -10,6 +10,11 @@ export default defineConfig({
       '@': path.resolve(process.cwd(), 'src')
     }
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5174'
+    }
+  },
   plugins: [
     react(),
   ]
