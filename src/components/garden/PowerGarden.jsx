@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import { getFlowerPlaceholder } from '../../lib/placeholder-images';
+import { fetchAiImage } from '../../lib/ai-image';
 
 const FLOWER_TYPES = {
   rose: { 
@@ -63,27 +63,37 @@ export default function PowerGarden({ flowers = [], totalPicarats = 0, themeColo
 
   // Pre-generate all flower images on mount
   useEffect(() => {
-    const preGenerateFlowerImages = () => {
+    let active = true;
+
+    const preGenerateFlowerImages = async () => {
       const uniqueFlowerTypes = [...new Set(flowers.map(f => f.flower_type))];
-      
-      for (const flowerType of uniqueFlowerTypes) {
+
+      await Promise.all(uniqueFlowerTypes.map(async (flowerType) => {
         const cacheKey = `flower_${flowerType}`;
         const cached = localStorage.getItem(cacheKey);
-        
-        if (!cached) {
-          localStorage.setItem(cacheKey, getFlowerPlaceholder(flowerType));
-        }
-      }
+        if (cached) return;
+
+        const prompt = FLOWER_TYPES[flowerType]?.prompt;
+        const image = await fetchAiImage(prompt);
+        if (!active) return;
+        localStorage.setItem(cacheKey, image);
+      }));
     };
 
     if (flowers.length > 0) {
       preGenerateFlowerImages();
     }
+
+    return () => {
+      active = false;
+    };
   }, [flowers]);
 
   // Load selected flower image
   useEffect(() => {
-    const loadFlowerImage = () => {
+    let active = true;
+
+    const loadFlowerImage = async () => {
       if (!selectedFlower) {
         setFlowerImage(null);
         return;
@@ -91,7 +101,7 @@ export default function PowerGarden({ flowers = [], totalPicarats = 0, themeColo
 
       const cacheKey = `flower_${selectedFlower.flower_type}`;
       const cached = localStorage.getItem(cacheKey);
-      
+
       if (cached) {
         setFlowerImage(cached);
         setIsLoadingImage(false);
@@ -99,13 +109,19 @@ export default function PowerGarden({ flowers = [], totalPicarats = 0, themeColo
       }
 
       setIsLoadingImage(true);
-      const placeholder = getFlowerPlaceholder(selectedFlower.flower_type);
-      localStorage.setItem(cacheKey, placeholder);
-      setFlowerImage(placeholder);
+      const prompt = FLOWER_TYPES[selectedFlower.flower_type]?.prompt;
+      const image = await fetchAiImage(prompt);
+      if (!active) return;
+      localStorage.setItem(cacheKey, image);
+      setFlowerImage(image);
       setIsLoadingImage(false);
     };
 
     loadFlowerImage();
+
+    return () => {
+      active = false;
+    };
   }, [selectedFlower]);
 
   const themeGradients = {
