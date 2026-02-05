@@ -17,6 +17,15 @@ export function createApp({ ai }) {
     res.json({ text });
   });
 
+  app.post('/api/ai/image', async (req, res) => {
+    const { prompt } = req.body || {};
+    if (!prompt) {
+      return res.status(400).json({ error: 'prompt required' });
+    }
+    const image = await app.locals.ai.generateImage({ prompt });
+    res.json({ image });
+  });
+
   app.locals.ai = ai;
   return app;
 }
