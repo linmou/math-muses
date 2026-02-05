@@ -1,9 +1,6 @@
 // Scene background component with offline placeholders
 import React, { useState, useEffect } from 'react';
-import { fetchAiImage } from '../../lib/ai-image';
-
-// Cache for generated backgrounds
-const backgroundCache = {};
+import { getBackgroundImage } from '../../lib/scene-images';
 
 export default function SceneBackground({ sceneId, children }) {
   const [backgroundUrl, setBackgroundUrl] = useState(null);
@@ -27,29 +24,14 @@ export default function SceneBackground({ sceneId, children }) {
   };
 
   useEffect(() => {
-    let active = true;
-
-    const generateBackground = async () => {
+    const generateBackground = () => {
       const bgType = getBackgroundType(sceneId);
       if (!backgroundPrompts[bgType]) return;
-
-      // Check cache first
-      if (backgroundCache[bgType]) {
-        setBackgroundUrl(backgroundCache[bgType]);
-        return;
-      }
-
-      const image = await fetchAiImage(backgroundPrompts[bgType]);
-      backgroundCache[bgType] = image;
-      if (!active) return;
+      const image = getBackgroundImage(sceneId);
       setBackgroundUrl(image);
     };
 
     generateBackground();
-
-    return () => {
-      active = false;
-    };
   }, [sceneId]);
 
   return (

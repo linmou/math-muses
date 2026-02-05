@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchAiImage } from '../../lib/ai-image';
+import { getSceneImage } from '../../lib/scene-images';
 
 // Scene image prompts for AI generation
 const SCENE_PROMPTS = {
@@ -14,37 +14,20 @@ const SCENE_PROMPTS = {
   ribbon_hallway: "An elegant hallway decorated with colorful silk ribbons flowing from ceiling, rainbow ribbons creating curtain-like effect, soft pastel walls, magical fashion studio corridor, anime illustration style, Ghibli-inspired art, dreamy atmosphere with gentle breeze effect, warm golden lighting"
 };
 
-const sceneCache = {};
-
 export function useSceneImage(location) {
   const [imageUrl, setImageUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    let active = true;
-
-    const generateImage = async () => {
+    const generateImage = () => {
       if (!location || !SCENE_PROMPTS[location]) return;
       setIsLoading(true);
-
-      if (sceneCache[location]) {
-        setImageUrl(sceneCache[location]);
-        setIsLoading(false);
-        return;
-      }
-
-      const image = await fetchAiImage(SCENE_PROMPTS[location]);
-      sceneCache[location] = image;
-      if (!active) return;
+      const image = getSceneImage(location);
       setImageUrl(image);
       setIsLoading(false);
     };
 
     generateImage();
-
-    return () => {
-      active = false;
-    };
   }, [location]);
 
   return { imageUrl, isLoading };
