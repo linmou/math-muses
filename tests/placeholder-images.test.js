@@ -29,12 +29,10 @@ test('getScenePlaceholder returns svg data uri with label', () => {
   assert.ok(svg.toLowerCase().includes('rainbow'));
 });
 
-test('getCharacterPlaceholder returns svg data uri with label', () => {
+test('getCharacterPlaceholder uses avatar asset when available', () => {
   const uri = getCharacterPlaceholder('vera');
-  assert.ok(uri.startsWith('data:image/svg+xml;utf8,'));
-  const svg = decodeSvg(uri);
-  assert.ok(svg.includes('<svg'));
-  assert.ok(svg.toLowerCase().includes('vera'));
+  assert.ok(!uri.startsWith('data:image/svg+xml;utf8,'));
+  assert.ok(uri.toLowerCase().includes('vera_wang_avatar.png'));
 });
 
 test('unknown keys fall back to generic labels', () => {

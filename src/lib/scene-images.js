@@ -1,3 +1,4 @@
+import { getBackgroundAsset, getSceneAsset } from './asset-images.js';
 import { getScenePlaceholder } from './placeholder-images.js';
 
 const SCENE_KEYS = new Set([
@@ -10,7 +11,7 @@ const SCENE_KEYS = new Set([
 
 export const getSceneImage = (location) => {
   if (!location || !SCENE_KEYS.has(location)) return null;
-  return getScenePlaceholder(location);
+  return getSceneAsset(location) || getScenePlaceholder(location);
 };
 
 const getBackgroundType = (id) => {
@@ -22,5 +23,5 @@ const getBackgroundType = (id) => {
 
 export const getBackgroundImage = (sceneId) => {
   const bgType = getBackgroundType(sceneId || '');
-  return getScenePlaceholder(bgType);
+  return getBackgroundAsset(bgType) || getScenePlaceholder(bgType);
 };

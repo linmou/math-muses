@@ -1,3 +1,5 @@
+import { getCharacterAsset } from './asset-images.js';
+
 const DEFAULT_COLORS = ['#FDE68A', '#FBCFE8'];
 
 const FLOWER_COLORS = {
@@ -69,6 +71,8 @@ export const getScenePlaceholder = (sceneKey) => {
 };
 
 export const getCharacterPlaceholder = (characterId) => {
+  const asset = getCharacterAsset(characterId);
+  if (asset) return asset;
   const title = toTitle(characterId, 'Character');
   const colors = CHARACTER_COLORS[characterId] || DEFAULT_COLORS;
   return toDataUri(buildSvg({ title, subtitle: 'Companion', colors }));
