@@ -26,3 +26,11 @@ Static site env vars:
 Web service env vars:
 - `GEMINI_API_KEY` (set in Render dashboard)
 - `CORS_ORIGIN` → `https://math-muses-web.onrender.com`
+
+## Integration tests (live GenAI)
+
+These tests only run when explicitly enabled to avoid accidental API usage:
+
+```
+RUN_GENAI_INTEGRATION=1 GEMINI_API_KEY=your_key node --test tests/integration-genai.test.mjs
+```
