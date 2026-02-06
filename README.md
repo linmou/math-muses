@@ -15,3 +15,14 @@ If you only want the frontend, you can run: `npm run dev`. AI chat and flower im
 
 - Start API only: `npm run dev:api`
 - Production-style start: `npm run start`
+
+## Render split deployment
+
+This repo supports a split Render setup (static frontend + API service). The blueprint is in `render.yaml`.
+
+Static site env vars:
+- `VITE_API_BASE_URL` → `https://math-muses-api.onrender.com`
+
+Web service env vars:
+- `GEMINI_API_KEY` (set in Render dashboard)
+- `CORS_ORIGIN` → `https://math-muses-web.onrender.com`
