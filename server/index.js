@@ -1,13 +1,19 @@
 import { createApp } from './app.js';
-import { createGenAiClient } from './genai-client.js';
+import { loadBackendEnv } from './env.js';
+import { resolveAiClient } from './resolve-ai.js';
+
+loadBackendEnv();
 
 const port = Number(process.env.PORT || 5174);
 const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY is required');
+const env = process.env.NODE_ENV || 'development';
+
+const { ai, isFallback } = resolveAiClient({ apiKey, env });
+if (isFallback) {
+  console.warn('GEMINI_API_KEY missing. Using placeholder AI responses.');
 }
 
-const app = createApp({ ai: createGenAiClient({ apiKey }) });
+const app = createApp({ ai });
 app.listen(port, () => {
   console.log(`AI proxy listening on ${port}`);
 });
