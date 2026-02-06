@@ -1,3 +1,18 @@
+const resolveApiBaseUrl = () => {
+  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  if (typeof process !== 'undefined' && process.env?.VITE_API_BASE_URL) {
+    return process.env.VITE_API_BASE_URL;
+  }
+  return '';
+};
+
+const buildUrl = (path) => {
+  const base = resolveApiBaseUrl().replace(/\/$/, '');
+  return `${base}${path}`;
+};
+
 const postJson = async (url, body) => {
   const res = await fetch(url, {
     method: 'POST',
@@ -12,11 +27,11 @@ const postJson = async (url, body) => {
 };
 
 export const generateChat = async ({ messages, context }) => {
-  const data = await postJson('/api/ai/chat', { messages, context });
+  const data = await postJson(buildUrl('/api/ai/chat'), { messages, context });
   return data.text;
 };
 
 export const generateImage = async ({ prompt }) => {
-  const data = await postJson('/api/ai/image', { prompt });
+  const data = await postJson(buildUrl('/api/ai/image'), { prompt });
   return data.image;
 };

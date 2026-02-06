@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: math-muses-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        value: https://math-muses-web.onrender.com
+
+  - type: static
+    name: math-muses-web
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://math-muses-api.onrender.com

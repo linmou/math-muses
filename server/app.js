@@ -1,8 +1,20 @@
 import express from 'express';
 
-export function createApp({ ai }) {
+export function createApp({ ai, corsOrigin }) {
   const app = express();
   app.use(express.json({ limit: '1mb' }));
+  if (corsOrigin) {
+    app.use((req, res, next) => {
+      res.setHeader('Access-Control-Allow-Origin', corsOrigin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'content-type');
+      if (req.method === 'OPTIONS') {
+        return res.status(204).end();
+      }
+      return next();
+    });
+  }
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' });

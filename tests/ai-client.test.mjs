@@ -23,6 +23,30 @@ test('generateImage returns image', async () => {
   assert.equal(image, 'data:image/png;base64,abc');
 });
 
+test('generateChat uses VITE_API_BASE_URL when set', async () => {
+  const prev = process.env.VITE_API_BASE_URL;
+  process.env.VITE_API_BASE_URL = 'https://example.com';
+  let calledUrl = '';
+  globalThis.fetch = async (url) => {
+    calledUrl = url;
+    return {
+      ok: true,
+      json: async () => ({ text: 'hi' })
+    };
+  };
+
+  try {
+    await generateChat({ messages: [{ role: 'user', content: 'hi' }] });
+    assert.equal(calledUrl, 'https://example.com/api/ai/chat');
+  } finally {
+    if (prev === undefined) {
+      delete process.env.VITE_API_BASE_URL;
+    } else {
+      process.env.VITE_API_BASE_URL = prev;
+    }
+  }
+});
+
 test.after(() => {
   globalThis.fetch = realFetch;
 });
