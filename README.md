@@ -1,4 +1,4 @@
-<!-- Updated: 2026-02-06 Commit: 2500199 -->
+<!-- Updated: 2026-02-06 Commit: 69b6b99 -->
 # Math Muses
 
 A frontend-first interactive math game and creative sandbox. AI features are optional and run through a local Node proxy.
