@@ -29,7 +29,7 @@ Web service env vars:
 
 ## Integration tests (live GenAI)
 
-These tests only run when explicitly enabled to avoid accidental API usage:
+These tests load `.env` automatically and only run when explicitly enabled to avoid accidental API usage:
 
 ```
 RUN_GENAI_INTEGRATION=1 GEMINI_API_KEY=your_key node --test tests/integration-genai.test.mjs

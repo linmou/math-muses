@@ -2,9 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGenAiClient } from '../server/genai-client.js';
+import { resolveIntegrationConfig } from './integration-genai-env.js';
 
-const apiKey = process.env.GEMINI_API_KEY;
-const shouldRun = process.env.RUN_GENAI_INTEGRATION === '1' && Boolean(apiKey);
+const { apiKey, shouldRun } = resolveIntegrationConfig();
 
 (shouldRun ? test : test.skip)('generateChat returns non-empty text', async () => {
   const client = createGenAiClient({ apiKey });
